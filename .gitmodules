@@ -1,0 +1,8 @@
+[submodule "src/main/java/org/lasarobotics"]
+	path = src/main/java/org/lasarobotics
+	url = https://github.com/Team5406/PurpleLib.git
+	branch = src-main
+[submodule "src/test/java/org/lasarobotics"]
+	path = src/test/java/org/lasarobotics
+	url = https://github.com/Team5406/PurpleLib.git
+	branch = src-test

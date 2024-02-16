@@ -7,6 +7,7 @@ package frc.team5406.robot.subsystems.shooter;
 import org.lasarobotics.hardware.revrobotics.Spark;
 import org.lasarobotics.hardware.revrobotics.Spark.FeedbackSensor;
 import org.lasarobotics.hardware.revrobotics.Spark.MotorKind;
+import org.lasarobotics.utils.GlobalConstants;
 import org.lasarobotics.hardware.revrobotics.SparkPIDConfig;
 
 import com.revrobotics.CANSparkBase.ControlType;
@@ -171,7 +172,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return Feed forward voltage to apply
    */
   private double armFFCalculator(TrapezoidProfile.State state) {
-    return m_armFF.calculate(state.velocity, state.position);
+    return m_armFF.calculate(state.velocity);
   }
 
 

@@ -143,7 +143,7 @@ public class ShooterSubsystem extends SubsystemBase {
    */
   private void setState(State state) {
     m_desiredShooterState = state;
-    m_armMotor.smoothMotion(ARM_GEAR_RATIO, m_armMotionConstraints, this::armFFCalculator);
+    m_armMotor.smoothMotion(state.armAngle.in(Units.Degrees), m_armMotionConstraints, this::armFFCalculator);
     m_flywheelMotor.set(state.flywheelSpeed.in(Units.RPM), ControlType.kVelocity);
   }
 

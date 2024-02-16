@@ -5,7 +5,6 @@
 package frc.team5406.robot.subsystems.drive;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -15,8 +14,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AutoTrajectory {
@@ -32,14 +29,8 @@ public class AutoTrajectory {
   public AutoTrajectory(DriveSubsystem driveSubsystem, String autoName) {
     this.m_driveSubsystem = driveSubsystem;
 
-    String selectedAutoName = autoName + "-Blue";
-    Optional<Alliance> ally = DriverStation.getAlliance();
-    if (ally.isPresent()) {
-      if (ally.get() == Alliance.Red) selectedAutoName = autoName + "-Red";
-    }
-
     // Get path
-    m_auto = new Pair<String, List<PathPlannerPath>>(selectedAutoName, PathPlannerAuto.getPathGroupFromAutoFile(selectedAutoName));
+    m_auto = new Pair<String, List<PathPlannerPath>>(autoName, PathPlannerAuto.getPathGroupFromAutoFile(autoName));
   }
 
   /**
@@ -73,8 +64,7 @@ public class AutoTrajectory {
       ? AutoBuilder.followPath(m_auto.getSecond().get(0))
       : new PathPlannerAuto(m_auto.getFirst());
 
-    return m_driveSubsystem.resetPoseCommand(() -> new Pose2d())
-      .andThen(m_driveSubsystem.resetPoseCommand(() -> getInitialPose()))
+    return m_driveSubsystem.resetPoseCommand(() -> getInitialPose())
       .andThen(autoCommand)
       .andThen(() -> m_driveSubsystem.resetRotatePID())
       .andThen(m_driveSubsystem.stopCommand())

@@ -4,7 +4,7 @@
 3. Extract the `maven_offline.zip` file and move the org file into `C:/Users/Public/wpilib/2024/maven `
 4. In your vs code terminal run `git submodule update --init --recursive `
 
-# Contributers
+# Contributors
 1. Cris B.
 2. David E.
 3. Angelos H.

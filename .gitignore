@@ -170,9 +170,19 @@ out/
 
 # Simulation GUI and other tools window save file
 *-window.json
+networktables.json
+simgui.json
+simgui-ds.json
+
 
 # Simulation data log directory
 logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
+
+# Build Constants
+src/main/java/frc/team5406/robot/BuildConstants.java
+
+# Battery Tracker
+previous_battery.txt

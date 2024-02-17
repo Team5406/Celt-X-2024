@@ -45,6 +45,7 @@ public final class Constants {
 
     public static final ControlCentricity DRIVE_CONTROL_CENTRICITY = ControlCentricity.FIELD_CENTRIC;
 
+    // TODO: Update the throttle input curve range (Y) to match the real theoretical velocity of the module, and to the driver's preference
     private static final double DRIVE_THROTTLE_INPUT_CURVE_X[] = { 0.0, 0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900, 1.000 };
     private static final double DRIVE_THROTTLE_INPUT_CURVE_Y[] = { 0.0, 0.042, 0.168, 0.378, 0.672, 1.050, 1.512, 2.508, 2.688, 3.402, 4.300 };
     private static final double DRIVE_TURN_INPUT_CURVE_X[] = { 0.0, 0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900, 1.0 };
@@ -78,8 +79,8 @@ public final class Constants {
   public static class ArmHardware {
     public static final Spark.ID ARM_MOTOR_ID = new Spark.ID("ArmHardware", 9);
     public static final int ARM_GEAR_RATIO = 64; //FIXME
-    public static final int CURRENT_LIMIT_ARM = 30;  
-    public static final PIDConstants ARM_ROTATE_PID = new PIDConstants( 0.010086, 0.0, 0.0, 0.0);
+    public static final int CURRENT_LIMIT_ARM = 30;
+    public static final PIDConstants ARM_ROTATE_PID = new PIDConstants(0.010086, 0.0, 0.0, 0.0);
     public static final double ARM_TARGET_RPM = 0;
     public static final boolean ARM_ROTATE_SENSOR_PHASE=false;
     public static final boolean ARM_ROTATE_INVERT_MOTOR=false;
@@ -106,7 +107,7 @@ public static class FeederHardware {
     public static final boolean FEEDER_SENSOR_PHASE=false;
     public static final boolean FEEDER_INVERT_MOTOR=false;
     public static final double FEEDER_TOLERANCE=0.1;
-    public static final PIDConstants FEEDER_PID = new PIDConstants( 9.565E-08, 0.0, 0.0, 0.0);
+    public static final PIDConstants FEEDER_PID = new PIDConstants(9.565E-08, 0.0, 0.0, 0.0);
     public static final double FEEDER_KS = 0.03095;//0.19095;
     public static final double FEEDER_KV = 0.1215 / 1.01;
     public static final double FEEDER_KA = 0.0086947;
@@ -116,7 +117,7 @@ public static class FeederHardware {
     public static final Spark.ID SHOOTER_MOTOR_ID = new Spark.ID("ShooterHardware", 10);
     public static final double SHOOTER_TARGET_RPM = 1000;
     public static final int SHOOTER_CURRENT_LIMIT = 80;
-    public static final PIDConstants SHOOTER_PID = new PIDConstants( 1.1159E-05, 0.0, 0.0, 0.0);
+    public static final PIDConstants SHOOTER_PID = new PIDConstants(1.1159E-05, 0.0, 0.0, 0.0);
     public static final boolean SHOOTER_SENSOR_PHASE=false;
     public static final boolean SHOOTER_INVERT_MOTOR=false;
     public static final double SHOOTER_TOLERANCE=0.1;
@@ -132,7 +133,7 @@ public static class FeederHardware {
     public static final double INTAKE_SET_SPEED = -4000;
     public static final double INTAKE_FEEDER_SPEED = -1000;
   }
-  
+
 //is not strong enough to make shot
   public static class PodiumSettings {
     public static final double PODIUM_ARM_ANGLE = -18;

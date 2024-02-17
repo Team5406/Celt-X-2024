@@ -49,20 +49,20 @@ public class ArmSubsystem extends SubsystemBase{
     public double getArmAngle() {
       return armMotor.getInputs().encoderPosition;
       }
-    
+
     public double getArmVelocity() {
       return armMotor.getInputs().encoderVelocity;
     }
-    
+
     public void resetArmAngle() {
       armMotor.resetEncoder(0);
     }
-    
+
     //Change the angle of the arm
     public void stopArm() {
       gotoArmAngle(getArmAngle());
     }
-    
+
     public void setArmSpeed(double speed) {
       armMotor.set(speed);
     }
@@ -71,7 +71,7 @@ public class ArmSubsystem extends SubsystemBase{
       double angle = SmartDashboard.getNumber("Arm Angle Target RPM", 0); //FIXME
       gotoArmAngle(angle);
     }
-    
+
     public void gotoArmAngle(double angle) {
       armMotor.set(angle, ControlType.kPosition);
     }
@@ -79,17 +79,17 @@ public class ArmSubsystem extends SubsystemBase{
     public void useOutputPosition(double output, TrapezoidProfile.State setpoint) {
 
       double angle = getArmAngle();
-    
+
       double arbFF = armFF.calculate(Units.degreesToRadians(angle), Units.degreesToRadians(setpoint.velocity));
       armMotor.set(setpoint.position, ControlType.kPosition, arbFF, SparkPIDController.ArbFFUnits.kVoltage);
-      }
+    }
 
       public ArmSubsystem() {
         setupMotors();
       }
-      
+
       public void periodic(){
         armMotor.periodic();
-        SmartDashboard.putNumber("Arm Angle", getArmAngle()); 
+        SmartDashboard.putNumber("Arm Angle", getArmAngle());
       }
     }

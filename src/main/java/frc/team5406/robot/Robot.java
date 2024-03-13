@@ -4,6 +4,8 @@
 
 package frc.team5406.robot;
 
+import java.util.Optional;
+
 import org.lasarobotics.utils.GlobalConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -12,6 +14,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -20,6 +24,17 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  public void checkDSUpdate() {
+    Optional<Alliance> alliance = null;
+
+    alliance = DriverStation.getAlliance();
+
+    // If we have data, and have a new alliance from last time
+    if (DriverStation.isDSAttached() && Constants.currentAlliance != alliance) {
+      Constants.currentAlliance = alliance;
+    }
+} 
 
   public Robot() {
     super(GlobalConstants.ROBOT_LOOP_PERIOD);
@@ -31,7 +46,7 @@ public class Robot extends LoggedRobot {
     // AdvantageKit Logging
     //BatteryTracker batteryTracker = new BatteryTracker(BatteryTracker.initializeHardware());
     Logger.recordMetadata("ProjectName", "PurpleSwerve");
-    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    //Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     //Logger.recordMetadata("BatteryName", batteryTracker.scanBattery());
 
     if (isReal()) {
@@ -57,12 +72,14 @@ public class Robot extends LoggedRobot {
         // Save outputs to a new log
         Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
       }
+    
     }
 
     // Start logging! No more data receivers, replay sources, or metadata values may be added.
     Logger.start();
 
     m_robotContainer = new RobotContainer();
+    checkDSUpdate();
   }
 
   @Override
@@ -81,8 +98,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.getZeroingCommand().schedule();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    checkDSUpdate();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -99,6 +117,8 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.getZeroingCommand().schedule();
+    checkDSUpdate();
   }
 
   @Override

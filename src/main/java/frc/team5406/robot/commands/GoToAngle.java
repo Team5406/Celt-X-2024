@@ -8,8 +8,7 @@ public class GoToAngle extends Command {
     final ArmSubsystem arm;
     final Double angle;
 
-    public GoToAngle(ArmSubsystem arm, double angle)
-  {
+    public GoToAngle(ArmSubsystem arm, double angle){
     this.arm = arm;
     this.angle = angle;
     addRequirements(arm);
@@ -17,30 +16,25 @@ public class GoToAngle extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize()
-  {
+  public void initialize(){
     arm.gotoArmAngle(angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute()
-  {
+  public void execute(){
   
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted)
-  {
+  public void end(boolean interrupted){
     System.out.println("end");
   }
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished()
-  //Math.abs(arm.getArmVelocity()) < 500
-  {
+  public boolean isFinished(){
     if(Math.abs(arm.getArmAngle() - angle) <10 && Math.abs(arm.getArmVelocity()) < 1500){
       return true;
     }else {

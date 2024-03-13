@@ -1,0 +1,96 @@
+//currently brokey for no reason
+package frc.team5406.robot.commands;
+
+import frc.team5406.robot.Constants;
+import frc.team5406.robot.Constants.Drive;
+
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.team5406.robot.subsystems.drive.DriveSubsystem;
+import frc.team5406.robot.subsystems.vision.ObjectDetection;
+
+
+
+/** A command that will turn the robot to the specified angle. */
+public class AlignWithNote extends PIDCommand {
+  private final DriveSubsystem drive;
+  private final ObjectDetection orangepi;
+  private final DoubleSupplier vX;
+  private final DoubleSupplier vY;
+  private final boolean note;
+
+    //DriveSubsystem drive;
+  /**
+   * Turns to robot to the specified angle.
+   *
+   * @param targetAngleDegrees The angle to turn to
+   * @param drive The drive subsystem to use
+   */
+  public AlignWithNote(DriveSubsystem drive, ObjectDetection orangepi, DoubleSupplier vX, DoubleSupplier vY, boolean note) {
+    super(
+        new PIDController(Constants.ObjectDetection.OBJECTDETECTION_NOTE_KP, 
+        Constants.ObjectDetection.OBJECTDETECTION_NOTE_KI, 
+        Constants.ObjectDetection.OBJECTDETECTION_NOTE_KD),
+        // Close loop on heading
+        () -> orangepi.getCenterDistance(note),
+        // center limelight on target, tx = 0
+        Constants.ObjectDetection.OBJECTDETECTION_NOTE_OFFSET
+        // Pipe output to turn robot
+        //output -> drive.drive(new Translation2d(Math.pow(vX.getAsDouble(), 3)*1, Math.pow(vY.getAsDouble(), 3)*1), output, true, false)
+        output -> drive.driveCommand(vX, vY,() -> output),
+        // Require the drive
+        drive);
+
+    // Set the controller to be continuous (because it is an angle controller)
+    //getController().enableContinuousInput(-180, 180);
+    // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
+    // setpoint before it is considered as having reached the reference
+    getController()
+        .setTolerance(Constants.TAG_TURN_TOLERANCE);
+        System.out.println("Align With Note - Start");
+        this.drive = drive;
+        this.orangepi = orangepi;
+        this.vX = vX;
+        this.vY = vY;
+        this.note = note;
+  }
+
+  /*public AlignWithNote(DriveSubsystem drive, ObjectDetection orangepi, DoubleSupplier vX, DoubleSupplier vY, boolean fieldRel, boolean cone) {
+    super(
+        new PIDController(1e-2, 0, 1e-5),
+        // Close loop on heading
+        () -> orangepi.getCenterDistance(cone),
+        // center limelight on target, tx = 0
+        0,
+        // Pipe output to turn robot
+        output -> drive.drive(new Translation2d(Math.pow(vX.getAsDouble(), 3), Math.pow(vY.getAsDouble(), 3)), output, fieldRel, false),
+        // Require the drive
+        drive);
+
+    // Set the controller to be continuous (because it is an angle controller)
+    //getController().enableContinuousInput(-180, 180);
+    // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
+    // setpoint before it is considered as having reached the reference
+    getController()
+        .setTolerance(Constants.TAG_TURN_TOLERANCE);
+        System.out.println("Align With Note - Start");
+        this.drive = drive;
+        this.orangepi = orangepi;
+        this.vX = vX;
+        this.vY = vY;
+        this.cone = cone;
+  }*/
+
+  @Override
+  public boolean isFinished() {
+    //never end
+    return false;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+  }
+}

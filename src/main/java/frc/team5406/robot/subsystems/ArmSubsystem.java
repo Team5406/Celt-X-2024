@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import org.lasarobotics.hardware.revrobotics.SparkPIDConfig;
@@ -17,45 +16,57 @@ import org.lasarobotics.hardware.revrobotics.SparkPIDConfig;
 public class ArmSubsystem extends SubsystemBase{
     private Spark armMotor = new Spark(Constants.ArmHardware.ARM_MOTOR_ID, MotorKind.NEO);
 
-    SimpleMotorFeedforward armFF = new SimpleMotorFeedforward(Constants.ArmHardware.ARM_KS, Constants.ArmHardware.ARM_KV,
-    Constants.ArmHardware.ARM_KA);
+    double armConversionFactor = (Constants.DEGREES_PER_ROTATION / Constants.ArmHardware.ARM_GEAR_RATIO);
+    private boolean climbing = false;
 
     public void setupMotors(){
-      armMotor.restoreFactoryDefaults();
       armMotor.setSmartCurrentLimit(Constants.ArmHardware.CURRENT_LIMIT_ARM);
-      double armConversionFactor = (Constants.DEGREES_PER_ROTATION / Constants.ArmHardware.ARM_GEAR_RATIO);
 
-      armMotor.setPositionConversionFactor(Spark.FeedbackSensor.NEO_ENCODER,  armConversionFactor);
-      armMotor.setVelocityConversionFactor(Spark.FeedbackSensor.NEO_ENCODER,  armConversionFactor / 60);
+      armMotor.setPositionConversionFactor(Spark.FeedbackSensor.NEO_ENCODER, 1);
+      armMotor.setVelocityConversionFactor(Spark.FeedbackSensor.NEO_ENCODER, 1);
 
       SparkPIDConfig armMotorConfig = new SparkPIDConfig(
         Constants.ArmHardware.ARM_ROTATE_PID,
         Constants.ArmHardware.ARM_ROTATE_SENSOR_PHASE,
         Constants.ArmHardware.ARM_ROTATE_INVERT_MOTOR,
-        Constants.ArmHardware.ARM_ROTATE_TOLERANCE,
-        Constants.ArmHardware.ARM_ROTATE_LOWER_LIMIT,
-        Constants.ArmHardware.ARM_ROTATE_UPPER_LIMIT,
-        Constants.ArmHardware.ARM_ROTATE_SOFT_LIMITS
+        Constants.ArmHardware.ARM_ROTATE_TOLERANCE
       );
         // Initialize PID
         armMotor.initializeSparkPID(armMotorConfig, Spark.FeedbackSensor.NEO_ENCODER);
-
-        SmartDashboard.putNumber("Arm Angle Target RPM", Constants.ArmHardware.ARM_TARGET_RPM);
+        armMotor.setSmartMotionAllowedClosedLoopError(Constants.ArmHardware.ARM_POSITION_TOLERANCE);
+        armMotor.setIZone(0);
+        armMotor.setSmartMotionMaxVelocity(5500);
+        armMotor.setSmartMotionMaxAccel(8000);
+        armMotor.setMeasurementPeriod();
+        armMotor.setAverageDepth();
 
         resetArmAngle();
         armMotor.burnFlash();
     }
 
+    //states of being not actually climbing
+    public void climbing(){
+      climbing = true;
+    }
+
+    public void notClimbing(){
+      climbing = false;
+    }
+
+    public boolean getClimbing(){
+      return climbing;
+    }
+
     public double getArmAngle() {
-      return armMotor.getInputs().encoderPosition;
+      return armConversionFactor*armMotor.getInputs().encoderPosition;
       }
     
     public double getArmVelocity() {
-      return armMotor.getInputs().encoderVelocity;
+      return (armConversionFactor/60) *armMotor.getInputs().encoderVelocity;
     }
     
     public void resetArmAngle() {
-      armMotor.resetEncoder(0);
+      armMotor.resetEncoder(Constants.ArmHardware.ARM_ZERO_ANGLE/armConversionFactor);
     }
     
     //Change the angle of the arm
@@ -73,23 +84,27 @@ public class ArmSubsystem extends SubsystemBase{
     }
     
     public void gotoArmAngle(double angle) {
-      armMotor.set(angle, ControlType.kPosition);
+      angle /= armConversionFactor;
+      double currentAngle = getArmAngle();
+      double arbFF =  Constants.ArmHardware.ARM_KG * Math.cos(Units.degreesToRadians((Constants.ArmHardware.ARM_ZERO_ANGLE+currentAngle)));
+
+      armMotor.set(angle, ControlType.kSmartMotion, arbFF, SparkPIDController.ArbFFUnits.kVoltage);
+    }
+
+    public double getArmCurrent (){
+      return armMotor.getInputs().current;
     }
 
     public void useOutputPosition(double output, TrapezoidProfile.State setpoint) {
 
-      double angle = getArmAngle();
-    
-      double arbFF = armFF.calculate(Units.degreesToRadians(angle), Units.degreesToRadians(setpoint.velocity));
-      armMotor.set(setpoint.position, ControlType.kPosition, arbFF, SparkPIDController.ArbFFUnits.kVoltage);
-      }
-
-      public ArmSubsystem() {
-        setupMotors();
-      }
-      
-      public void periodic(){
-        armMotor.periodic();
-        SmartDashboard.putNumber("Arm Angle", getArmAngle()); 
-      }
     }
+
+    public ArmSubsystem() {
+      setupMotors();
+    }
+      
+    public void periodic(){
+      armMotor.periodic();
+      SmartDashboard.putNumber("Arm Angle", getArmAngle()); 
+    }
+}

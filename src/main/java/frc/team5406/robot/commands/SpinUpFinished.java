@@ -2,30 +2,32 @@ package frc.team5406.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.team5406.robot.Constants;
-import frc.team5406.robot.subsystems.FeederSubsystem;
+import frc.team5406.robot.subsystems.ShooterSubsystem;
 
-public class Shoot extends Command {
+public class SpinUpFinished extends Command {
     boolean noteSeen = false;
-    final FeederSubsystem feeder;
+    final ShooterSubsystem shoot;
+    final double speed;
+    final boolean same;
 
-    public Shoot(FeederSubsystem feeder){
-      this.feeder = feeder;
-      addRequirements(feeder);
+    public SpinUpFinished(ShooterSubsystem shoot, double speed, boolean same){
+      this.shoot = shoot;
+      this.speed = speed;
+      this.same = same;
+      addRequirements(shoot);
     }
 
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize(){
-    feeder.setFeederSpeed(-Constants.SubwooferSettings.SHOOT_FEEDER_SPEED);
+    shoot.setShooterSpeed(speed, same);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    if(feeder.getToFStatus() && feeder.getToFDistance() < Constants.FeederHardware.TOF_NOTE_SEEN_THRESHOLD){
-      noteSeen = true;
-    }
+  
   }
 
   // Called once the command ends or is interrupted.
@@ -36,6 +38,6 @@ public class Shoot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished(){
-    return noteSeen && feeder.getToFStatus() && feeder.getToFDistance() >= Constants.FeederHardware.TOF_NOTE_PASSED_THRESHOLD;
+    return Math.abs(speed - shoot.getShooterSpeedRight())< Constants.ShooterHardware.SPEED_THRESHOLD;
   }
 }

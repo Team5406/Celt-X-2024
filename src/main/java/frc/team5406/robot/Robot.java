@@ -51,7 +51,7 @@ public class Robot extends LoggedRobot {
 
     if (isReal()) {
       // If robot is real, log to USB drive and publish data to NetworkTables
-      Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+      Logger.addDataReceiver(new WPILOGWriter("/media/sda1/Durham/"));
       Logger.addDataReceiver(new NT4Publisher());
       new PowerDistribution();
       // Battery Tracking
@@ -70,7 +70,7 @@ public class Robot extends LoggedRobot {
         // Read replay log
         Logger.setReplaySource(new WPILOGReader(logPath));
         // Save outputs to a new log
-        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/Durham/"));
       }
     
     }
@@ -88,7 +88,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+        m_robotContainer.stopRumbling().schedule();
+  }
 
   @Override
   public void disabledPeriodic() {}

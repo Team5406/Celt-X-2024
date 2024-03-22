@@ -7,17 +7,24 @@ import frc.team5406.robot.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+
+
 import org.lasarobotics.hardware.revrobotics.Spark;
 import org.lasarobotics.hardware.revrobotics.SparkPIDConfig;
 import org.lasarobotics.hardware.revrobotics.Spark.MotorKind;
 
-public class IntakeSubsystem extends SubsystemBase {
-  private Spark intakeMotor = new Spark(Constants.IntakeHardware.INTAKE_MOTOR_ID, MotorKind.NEO_VORTEX);
-  SimpleMotorFeedforward intakeFF = new SimpleMotorFeedforward(Constants.IntakeHardware.INTAKE_KS, Constants.IntakeHardware.INTAKE_KV, Constants.IntakeHardware.INTAKE_KA);
 
+public class IntakeSubsystem extends SubsystemBase {
+
+  private Spark intakeMotor = new Spark(Constants.IntakeHardware.INTAKE_MOTOR_ID, MotorKind.NEO_VORTEX);
+  SimpleMotorFeedforward intakeFF = new SimpleMotorFeedforward(Constants.IntakeHardware.INTAKE_KS, Constants.IntakeHardware.INTAKE_KV,
+  Constants.IntakeHardware.INTAKE_KA);
+  
   public void setupMotors(){
     intakeMotor.setSmartCurrentLimit(Constants.IntakeHardware.INTAKE_CURRENT_LIMIT);
+
     double intakeConversionFactor = 1.0;
+
     intakeMotor.setVelocityConversionFactor(Spark.FeedbackSensor.NEO_ENCODER, intakeConversionFactor);
 
     SparkPIDConfig intakeMotorConfig = new SparkPIDConfig(
@@ -26,6 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
       Constants.IntakeHardware.INTAKE_INVERT_MOTOR,
       Constants.IntakeHardware.INTAKE_TOLERANCE
     );
+
     intakeMotor.initializeSparkPID(intakeMotorConfig, Spark.FeedbackSensor.NEO_ENCODER);
     intakeMotor.burnFlash();
   
@@ -39,7 +47,9 @@ public class IntakeSubsystem extends SubsystemBase {
       double arbFF = intakeFF.calculate(RPM);
       intakeMotor.set(RPM,ControlType.kVelocity, arbFF, SparkPIDController.ArbFFUnits.kVoltage);
     }
+
   }
+
 
   public void setIntakeManual() {
     double RPM = SmartDashboard.getNumber("Intake Target RPM", Constants.IntakeHardware.INTAKE_TARGET_RPM);

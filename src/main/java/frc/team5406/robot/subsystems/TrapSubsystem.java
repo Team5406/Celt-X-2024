@@ -6,20 +6,31 @@ import org.lasarobotics.hardware.revrobotics.Spark;
 import org.lasarobotics.hardware.revrobotics.Spark.MotorKind;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import org.lasarobotics.hardware.revrobotics.SparkPIDConfig;
 
 public class TrapSubsystem extends SubsystemBase{
     private Spark trapMotor = new Spark(Constants.TrapHardware.TRAP_MOTOR_ID, MotorKind.NEO_550);
-    ArmFeedforward trapFF = new ArmFeedforward(Constants.TrapHardware.TRAP_KS, Constants.TrapHardware.TRAP_KG, Constants.TrapHardware.TRAP_KV);
+
+    ArmFeedforward trapFF = new ArmFeedforward(Constants.TrapHardware.TRAP_KS, Constants.TrapHardware.TRAP_KG,
+    Constants.TrapHardware.TRAP_KV);
 
     public void setupMotors(){
       trapMotor.setSmartCurrentLimit(Constants.TrapHardware.TRAP_CURRENT_LIMIT);
+      /*double trapConversionFactor = (Constants.DEGREES_PER_ROTATION / Constants.TrapHardware.TRAP_GEAR_RATIO);
+
+      trapMotor.setPositionConversionFactor(Spark.FeedbackSensor.NEO_ENCODER,  trapConversionFactor);
+      trapMotor.setVelocityConversionFactor(Spark.FeedbackSensor.NEO_ENCODER,  trapConversionFactor / 60);*/
+
       trapMotor.setPositionConversionFactor(Spark.FeedbackSensor.NEO_ENCODER,  1);
       trapMotor.setVelocityConversionFactor(Spark.FeedbackSensor.NEO_ENCODER,  1);
 
+      
       SparkPIDConfig trapMotorConfig = new SparkPIDConfig(
         Constants.TrapHardware.TRAP_ROTATE_PID,
         Constants.TrapHardware.TRAP_ROTATE_SENSOR_PHASE,
@@ -28,10 +39,11 @@ public class TrapSubsystem extends SubsystemBase{
       );
         // Initialize PID
         trapMotor.initializeSparkPID(trapMotorConfig, Spark.FeedbackSensor.NEO_ENCODER);
+
         trapMotor.setSmartMotionAllowedClosedLoopError(Constants.TrapHardware.TRAP_POSITION_TOLERANCE);
         trapMotor.setIZone(0);
-        trapMotor.setSmartMotionMaxVelocity(2000);
-        trapMotor.setSmartMotionMaxAccel(5000);
+        trapMotor.setSmartMotionMaxVelocity(3000);
+        trapMotor.setSmartMotionMaxAccel(6000);
         trapMotor.setMeasurementPeriod();
         trapMotor.setAverageDepth();
 
@@ -73,13 +85,13 @@ public class TrapSubsystem extends SubsystemBase{
       return trapMotor.getInputs().current;
     }
 
-    public TrapSubsystem() {
-      setupMotors();
-    }
+      public TrapSubsystem() {
+        setupMotors();
+      }
 
 
-    public void periodic(){
-      trapMotor.periodic();
-      SmartDashboard.putNumber("Trap Angle", getTrapAngle()); 
-    }
+      public void periodic(){
+        trapMotor.periodic();
+        SmartDashboard.putNumber("Trap Angle", getTrapAngle()); 
+      }
 }

@@ -1,4 +1,3 @@
-//currently brokey for no reason
 package frc.team5406.robot.commands;
 
 import frc.team5406.robot.Constants;
@@ -16,6 +15,7 @@ import frc.team5406.robot.subsystems.vision.ObjectDetection;
 
 /** A command that will turn the robot to the specified angle. */
 public class AlignWithNote extends PIDCommand {
+
   private final DriveSubsystem drive;
   private final ObjectDetection orangepi;
   private final DoubleSupplier vX;

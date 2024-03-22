@@ -5,11 +5,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ObjectDetection extends SubsystemBase{
+
     public double foundNote = 0;
     public double noteDistance = 0;
     double frameCenter = 410;
 
     public void updateOrangepiTracking() {
+        
         foundNote = Double.valueOf(NetworkTableInstance.getDefault().getTable("orangepi").getEntry("FoundNote").getString("0"));
             
         if (foundNote == 1) {
@@ -33,4 +35,5 @@ public class ObjectDetection extends SubsystemBase{
     public void periodic() {
         updateOrangepiTracking();
     }
+
 }

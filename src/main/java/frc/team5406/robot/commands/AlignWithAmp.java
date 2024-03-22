@@ -10,8 +10,10 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.team5406.robot.Constants;
 
 public class AlignWithAmp extends Command {
+    
     final DriveSubsystem drive;
     final DoubleSupplier vX;
     final DoubleSupplier vY;
@@ -21,7 +23,8 @@ public class AlignWithAmp extends Command {
     final int tagID;
     private PIDController sidewaysController, rotationController;
 
-    public AlignWithAmp(VisionSubsystem camera, DriveSubsystem drive, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vRotate, int tagID){
+    public AlignWithAmp(VisionSubsystem camera, DriveSubsystem drive, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vRotate, int tagID)
+  {
     this.turnPID.setTolerance(2);
     turnPID.setSetpoint(0);
     turnPID.enableContinuousInput(-180, 180);
@@ -36,7 +39,8 @@ public class AlignWithAmp extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize(){
+  public void initialize()
+  {
     turnPID.reset();
 
     sidewaysController = new PIDController(0.1, 0, 0);
@@ -50,7 +54,9 @@ public class AlignWithAmp extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute(){
+  public void execute()
+  {
+    
     if (camera.hasTarget(tagID)){
         camera.getYaw(tagID).ifPresent((yaw) -> {
             System.out.println(yaw);
@@ -64,7 +70,8 @@ public class AlignWithAmp extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted){
+  public void end(boolean interrupted)
+  {
     System.out.println("end");
   }
 
@@ -80,11 +87,11 @@ public class AlignWithAmp extends Command {
       return false;
     } }*/ 
 
-  public boolean isFinished(){
-    if(rotationController.atSetpoint() && sidewaysController.atSetpoint()){
-      return true;
+    public boolean isFinished(){
+      if(rotationController.atSetpoint() && sidewaysController.atSetpoint()){
+        return true;
     }else{
-      return false;
+        return false;
     }  
   }
 }

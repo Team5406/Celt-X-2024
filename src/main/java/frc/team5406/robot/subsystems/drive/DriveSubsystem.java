@@ -4,6 +4,7 @@
 
 package frc.team5406.robot.subsystems.drive;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -85,7 +86,7 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
   public final Measure<Velocity<Distance>> DRIVE_MAX_LINEAR_SPEED;
   public final Measure<Velocity<Velocity<Distance>>> DRIVE_AUTO_ACCELERATION;
   public final Measure<Velocity<Angle>> DRIVE_ROTATE_VELOCITY = Units.RadiansPerSecond.of(12 * Math.PI);
-  public final Measure<Velocity<Velocity<Angle>>> DRIVE_ROTATE_ACCELERATION = Units.RadiansPerSecond.of(4 * Math.PI).per(Units.Second);
+  public final Measure<Velocity<Velocity<Angle>>> DRIVE_ROTATE_ACCELERATION = Units.RadiansPerSecond.of(3.9 * Math.PI).per(Units.Second);
   public static final Measure<Time> AUTO_LOCK_TIME = Units.Seconds.of(3.0);
   public static final Measure<Time> MAX_SLIPPING_TIME = Units.Seconds.of(1.0);
   public static final Measure<Current> DRIVE_CURRENT_LIMIT = Units.Amps.of(50.0);
@@ -227,7 +228,7 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
    * @return Hardware object containing all necessary devices for this subsystem
    */
   public static Hardware initializeHardware() {
-    NavX2 navx = new NavX2(Constants.DriveHardware.NAVX_ID, GlobalConstants.ROBOT_LOOP_HZ);
+    NavX2 navx = new NavX2(Constants.DriveHardware.NAVX_ID, GlobalConstants.ROBOT_LOOP_HZ *2);
 
     SDSMK4SwerveModule lFrontModule = new SDSMK4SwerveModule(
       SDSMK4SwerveModule.initializeHardware(
@@ -354,10 +355,10 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
    * Reset drive encoders
    */
   private void resetEncoders() {
-    m_lFrontModule.resetDriveEncoder();
+   /*  m_lFrontModule.resetDriveEncoder();
     m_rFrontModule.resetDriveEncoder();
     m_lRearModule.resetDriveEncoder();
-    m_rRearModule.resetDriveEncoder();
+    m_rRearModule.resetDriveEncoder();*/
   }
 
   /**
@@ -474,6 +475,14 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
 
   }
 
+    /**
+   * Aim robot by given angle
+   * @param angle Desired angle in degrees
+   */
+  public double aimAtAngleOutput(double angle) {
+    return m_rotatePIDController.calculate(getAngle().in(Units.Degrees), getAngle().in(Units.Degrees) + angle);
+  }
+  
   /**
    * Call this repeatedly to drive using PID during teleoperation
    * @param xRequest Desired X axis (forward) speed [-1.0, +1.0]
@@ -653,6 +662,12 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     );
   }
 
+    public Command driveCommand(DoubleSupplier xRequestSupplier, DoubleSupplier yRequestSupplier, DoubleSupplier rotateRequestSupplier, BooleanSupplier slow) {
+    return run(() ->
+      teleopPID(xRequestSupplier.getAsDouble(), yRequestSupplier.getAsDouble(), (slow.getAsBoolean()?0.75:1)*rotateRequestSupplier.getAsDouble())
+    );
+  }
+
   /**
    * Lock swerve modules
    * @return Command to lock swerve modules
@@ -749,6 +764,7 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
       Math.hypot(m_navx.getInputs().xVelocity.in(Units.MetersPerSecond), m_navx.getInputs().yVelocity.in(Units.MetersPerSecond))
     );
   }
+
 
   /**
    * Get pitch of robot

@@ -1,13 +1,18 @@
 package frc.team5406.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
+import org.apache.commons.math3.analysis.function.Constant;
 import org.lasarobotics.hardware.revrobotics.Spark;
 import org.lasarobotics.hardware.revrobotics.Spark.MotorKind;
 import org.lasarobotics.hardware.revrobotics.SparkPIDConfig;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,10 +20,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team5406.robot.Constants;
 
 public class ClimbSubsystem extends SubsystemBase {
+
     private Spark climberMotor = new Spark(Constants.ClimberHardware.CLIMB_MOTOR_ID, MotorKind.NEO_550);
-    static ElevatorFeedforward climbFF = new ElevatorFeedforward(Constants.ClimberHardware.CLIMBER_KS, Constants.ClimberHardware.CLIMBER_KG, Constants.ClimberHardware.CLIMBER_KV);
+    static ElevatorFeedforward climbFF = new ElevatorFeedforward(Constants.ClimberHardware.CLIMBER_KS,
+            Constants.ClimberHardware.CLIMBER_KG, Constants.ClimberHardware.CLIMBER_KV);
     
     public boolean hasZeroed = false;
+
     public double targetPosition = 0;
 
     public void setupMotors() {
@@ -76,11 +84,20 @@ public class ClimbSubsystem extends SubsystemBase {
     
     public void gotoClimberPosition(double position) {
       double currentPosition = getClimberPosition();
-      double ks = Constants.ClimberHardware.CLIMBER_KS;
-      double kg = Constants.ClimberHardware.CLIMBER_KG;
-      double kp = Constants.ClimberHardware.CLIMBER_PID.kP;
+
+        /*double ks = SmartDashboard.getNumber("ArmKS", Constants.ClimberHardware.CLIMBER_KS);
+        double kg = SmartDashboard.getNumber("ArmKG", Constants.ClimberHardware.CLIMBER_KG);
+        double kp = SmartDashboard.getNumber("ArmP", Constants.ClimberHardware.CLIMBER_ROTATE_PID.kP);*/
+
+        double ks = Constants.ClimberHardware.CLIMBER_KS;
+        double kg = Constants.ClimberHardware.CLIMBER_KG;
+        double kp = Constants.ClimberHardware.CLIMBER_PID.kP;
+
 
       double arbFF =  0;
+
+      //climberMotor.setP(kp);
+
       climberMotor.set(position, ControlType.kPosition, arbFF, SparkPIDController.ArbFFUnits.kVoltage);
     }
 
@@ -89,26 +106,39 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     public void holdClimberDown(){
-      setClimberSpeed(Constants.ClimberHardware.CLIMBER_HOLD_SPEED);
+        setClimberSpeed(Constants.ClimberHardware.CLIMBER_HOLD_SPEED);
     }
 
     public void holdClimberState(){
-      gotoClimberPosition(getClimberPosition());
+        gotoClimberPosition(getClimberPosition());
     }
 
     public void useOutputPosition(double output, TrapezoidProfile.State setpoint) {
+
       double position = getClimberPosition();
       double arbFF = climbFF.calculate(Units.degreesToRadians(position), Units.degreesToRadians(setpoint.velocity));
 
+
+       /* double ks = SmartDashboard.getNumber("ArmKS", Constants.ArmHinardware.ARM_KS);
+        double kg = SmartDashboard.getNumber("ArmKG", Constants.ClimberHardware.CLIMBER_KG);
+        double kv = SmartDashboard.getNumber("ArmKV", Constants.ClimberHardware.CLIMBER_KV);
+
+        double arbFF =  ks * Math.signum(Units.degreesToRadians(setpoint.velocity))
+        + kg * Math.cos(Units.degreesToRadians(angle))
+        + kv * Units.degreesToRadians(setpoint.velocity);*/
+
+
+
       climberMotor.set(setpoint.position, ControlType.kPosition, arbFF, SparkPIDController.ArbFFUnits.kVoltage);
-    }
+      }
 
     public ClimbSubsystem() {
-      setupMotors();
+        setupMotors();
     }
 
     public void periodic(){
-      climberMotor.periodic();
-      SmartDashboard.putNumber("Climber Position", getClimberPosition());
-    }
+        climberMotor.periodic();
+        SmartDashboard.putNumber("Climber Position", getClimberPosition());
+      }
+
 }

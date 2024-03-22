@@ -1,3 +1,4 @@
+
 package frc.team5406.robot.commands;
 
 import frc.team5406.robot.subsystems.ShooterSubsystem;
@@ -10,7 +11,10 @@ import frc.team5406.robot.subsystems.ArmSubsystem;
 import frc.team5406.robot.subsystems.FeederSubsystem;
 
 public class AmpShot extends SequentialCommandGroup{
-  public AmpShot(ArmSubsystem arm, ShooterSubsystem shooter, FeederSubsystem feeder){
+
+  public AmpShot(ArmSubsystem arm, ShooterSubsystem shooter, FeederSubsystem feeder)
+  {
+      
     addCommands(
       new ParallelCommandGroup(
         new MoveArmTrapezoidFinished(Constants.AmpShotSettings.AMPSHOT_ARM_ANGLE, arm),
@@ -23,3 +27,5 @@ public class AmpShot extends SequentialCommandGroup{
     );
    }
 }
+
+

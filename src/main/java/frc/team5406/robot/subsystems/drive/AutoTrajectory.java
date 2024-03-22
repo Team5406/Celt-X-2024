@@ -12,9 +12,11 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,38 +27,30 @@ public class AutoTrajectory {
   Pair<String,List<PathPlannerPath>> m_auto;
 
   /**
-   * Create new path trajectory using PathPlanner path
-   * @param driveSubsystem DriveSubsystem to drive the robot
-   * @param autoName PathPlanner auto name
-   */
-  public AutoTrajectory(DriveSubsystem driveSubsystem, String autoName) {
-    this.m_driveSubsystem = driveSubsystem;
-
-    String selectedAutoName = autoName + "-Blue";
-    Optional<Alliance> ally = DriverStation.getAlliance();
-    if (ally.isPresent()) {
-      if (ally.get() == Alliance.Red) selectedAutoName = autoName + "-Red";
-    }
-
-    // Get path
-    m_auto = new Pair<String, List<PathPlannerPath>>(selectedAutoName, PathPlannerAuto.getPathGroupFromAutoFile(selectedAutoName));
-  }
-
-  /**
    * Creates new path trajectory using a physical x,y coordinate points
    * @param driveSubsystem DriveSubsystem required for drivetrain movement
    * @param waypoints List of x, y coordinate pairs in trajectory
    * @param pathConstraints Path following constraints
    */
-  public AutoTrajectory(DriveSubsystem driveSubsystem, List<Pose2d> waypoints, PathConstraints pathConstraints) {
+  public AutoTrajectory(DriveSubsystem driveSubsystem, List<Pose2d> waypoints, PathConstraints pathConstraints, GoalEndState end) {
     this.m_driveSubsystem = driveSubsystem;
 
+    
     // Generate path from waypoints
     m_auto = new Pair<String, List<PathPlannerPath>>("", List.of(new PathPlannerPath(
       PathPlannerPath.bezierFromPoses(waypoints),
       pathConstraints,
-      new GoalEndState(0.0, waypoints.get(waypoints.size() - 1).getRotation())
+      end
     )));
+        /*Optional<Alliance> alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+      if (alliance.get() == Alliance.Red){
+            m_auto.getSecond().get(0).flipPath();
+      }else{
+        m_auto.getSecond();
+      }
+    }*/
+
   }
 
   /** Return initial pose */
@@ -73,9 +67,7 @@ public class AutoTrajectory {
       ? AutoBuilder.followPath(m_auto.getSecond().get(0))
       : new PathPlannerAuto(m_auto.getFirst());
 
-    return m_driveSubsystem.resetPoseCommand(() -> new Pose2d())
-      .andThen(m_driveSubsystem.resetPoseCommand(() -> getInitialPose()))
-      .andThen(autoCommand)
+    return autoCommand
       .andThen(() -> m_driveSubsystem.resetRotatePID())
       .andThen(m_driveSubsystem.stopCommand())
       .andThen(m_driveSubsystem.lockCommand());

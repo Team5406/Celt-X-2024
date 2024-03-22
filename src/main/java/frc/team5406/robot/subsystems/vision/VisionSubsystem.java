@@ -3,12 +3,14 @@ package frc.team5406.robot.subsystems.vision;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import org.lasarobotics.utils.GlobalConstants;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -17,6 +19,15 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -240,8 +251,8 @@ public class VisionSubsystem extends SubsystemBase implements AutoCloseable {
 
   public Optional<Double> getYaw(int desiredId){
      List<Integer> visibleTagIDs = getVisibleTagIDs();
-    if(visibleTagIDs!=null && visibleTagIDs.contains(desiredId)){
-      HashMap<Integer, PhotonTrackedTarget> visibleTags= getVisibleTags();
+    HashMap<Integer, PhotonTrackedTarget> visibleTags= getVisibleTags();
+    if(visibleTagIDs!=null && visibleTagIDs.contains(desiredId) && visibleTags !=null  && visibleTags.get(desiredId) !=null){
       return Optional.of(visibleTags.get(desiredId).getYaw());
     }else{
       return Optional.empty();
@@ -251,8 +262,8 @@ public class VisionSubsystem extends SubsystemBase implements AutoCloseable {
 
     public Optional<Double> getPitch(int desiredId){
     List<Integer> visibleTagIDs = getVisibleTagIDs();
-    if(visibleTagIDs!=null && visibleTagIDs.contains(desiredId)){
       HashMap<Integer, PhotonTrackedTarget> visibleTags= getVisibleTags();
+    if(visibleTagIDs!=null && visibleTagIDs.contains(desiredId) && visibleTags !=null && visibleTags.get(desiredId) !=null){
       return Optional.of(visibleTags.get(desiredId).getPitch());
     }else{
       return Optional.empty();

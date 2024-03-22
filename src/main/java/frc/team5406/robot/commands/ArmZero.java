@@ -4,11 +4,12 @@ import frc.team5406.robot.Constants;
 import frc.team5406.robot.subsystems.ArmSubsystem;
 
 public class ArmZero extends Command {
+
     private final ArmSubsystem arm;
     private int currentCounter = 0;
-    
     public ArmZero(ArmSubsystem arm) {
         this.arm = arm;
+   //     addRequirements(shooter);
     }
 
     @Override

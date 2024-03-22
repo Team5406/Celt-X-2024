@@ -1,8 +1,12 @@
 package frc.team5406.robot.commands;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.AddressableLED;
 import frc.team5406.robot.Constants;
 import frc.team5406.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 /** A command that will turn the robot to the specified angle using a motion profile. */
 public class MoveArmTrapezoidFinished extends Command {

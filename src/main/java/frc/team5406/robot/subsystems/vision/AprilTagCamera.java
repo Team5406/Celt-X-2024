@@ -13,14 +13,20 @@ import java.util.function.Predicate;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.units.collections.LongToObjectHashMap.IteratorFunction;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.team5406.robot.Constants;
 
 /** Create a camera */
 public class AprilTagCamera implements Runnable, AutoCloseable {
@@ -57,6 +63,8 @@ public class AprilTagCamera implements Runnable, AutoCloseable {
    * @param fovDiag Diagonal FOV of camera
    */
   public AprilTagCamera(String name, Transform3d transform, Resolution resolution, Rotation2d fovDiag) {
+
+    
     this.m_camera = new PhotonCamera(name);
     this.m_transform = transform;
     var fieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
@@ -96,7 +104,30 @@ public class AprilTagCamera implements Runnable, AutoCloseable {
     if (!pipelineResult.hasTargets()) return;
 
     m_atomicPipeline.set(pipelineResult);
+
+    /*if (pipelineResult.targets.size() == 1
+        && pipelineResult.targets.get(0).getPoseAmbiguity() > APRILTAG_POSE_AMBIGUITY_THRESHOLD) return;*/
+
+    // Update pose estimate
+    /*m_poseEstimator.update(pipelineResult).ifPresent(estimatedRobotPose -> {
+      var estimatedPose = estimatedRobotPose.estimatedPose;
+        // Make sure the measurement is on the field
+        if (estimatedPose.getX() > 0.0 && estimatedPose.getX() <= Constants.Field.FIELD_LENGTH
+            && estimatedPose.getY() > 0.0 && estimatedPose.getY() <= Constants.Field.FIELD_WIDTH) {
+          m_atomicEstimatedRobotPose.set(estimatedRobotPose);
+        }
+    });*/
   }
+
+  /**
+   * Gets the latest robot pose. Calling this will only return the pose once.
+   * If it returns a non-null value, it is a new estimate that hasn't been returned before.
+   * This pose will always be for the BLUE alliance.
+   * @return Latest estimated pose
+   */
+  /*public EstimatedRobotPose getLatestEstimatedPose() {
+    return m_atomicEstimatedRobotPose.getAndSet(null);
+  }*/
 
   public PhotonPipelineResult getLatestPipelineResult() {
     return m_atomicPipeline.getAndSet(null);
@@ -109,6 +140,38 @@ public class AprilTagCamera implements Runnable, AutoCloseable {
   public void setPipelineIndex(int index) {
     m_camera.setPipelineIndex(index);
   }
+
+  /*public boolean hasTargets() {
+    return m_camera.getLatestResult().hasTargets();
+  }
+
+  public double getYaw(int desiredId) {
+    double yaw = 0.0;
+    List<PhotonTrackedTarget> targets = m_camera.getLatestResult().getTargets();
+    if(hasTargets()){
+      for(PhotonTrackedTarget target : targets){
+        int targetId = target.getFiducialId();
+        if(targetId == desiredId){
+          yaw = target.getYaw();
+        }
+      }
+    }
+    return yaw;
+  }
+
+  public double getPitch(int desiredId) {
+    double pitch = 0.0;
+    List<PhotonTrackedTarget> targets = m_camera.getLatestResult().getTargets();
+    if(hasTargets()){
+      for(PhotonTrackedTarget target : targets){
+        int targetId = target.getFiducialId();
+        if(targetId == desiredId){
+          pitch = target.getPitch();
+        }
+      }
+    }
+    return pitch;
+  }*/
 
   /**
    * Get camera to robot transform

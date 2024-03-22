@@ -1,12 +1,13 @@
 package frc.team5406.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.team5406.robot.Constants;
+import frc.team5406.robot.subsystems.ArmSubsystem;
 import frc.team5406.robot.subsystems.TrapSubsystem;
 
 public class TrapZero extends Command {
+
     private final TrapSubsystem trap;
     private int currentCounter = 0;
-    
     public TrapZero(TrapSubsystem trap) {
         this.trap = trap;
     }

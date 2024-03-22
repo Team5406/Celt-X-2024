@@ -1,10 +1,11 @@
 package frc.team5406.robot.commands;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.team5406.robot.Constants;
+import frc.team5406.robot.subsystems.ArmSubsystem;
 import frc.team5406.robot.subsystems.ClimbSubsystem;
 
 public class ClimberZero extends Command {
+
     private final ClimbSubsystem climber;
     private int currentCounter = 0;
     public ClimberZero(ClimbSubsystem climber) {
@@ -28,7 +29,7 @@ public class ClimberZero extends Command {
     @Override
     public boolean isFinished() {
         //return ShooterSubsystem.getHoodCurrent() >= Constants.NEO550_CURRENT_SPIKE && Math.abs(ShooterSubsystem.getHoodVelocity()) <= 10;
-        return currentCounter >= 3;
+        return currentCounter >= 15;
     }
 
     @Override

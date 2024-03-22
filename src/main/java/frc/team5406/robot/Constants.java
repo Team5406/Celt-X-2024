@@ -6,6 +6,7 @@ package frc.team5406.robot;
 
 import java.util.Optional;
 import java.util.function.DoubleConsumer;
+
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.lasarobotics.drive.AdvancedSwerveKinematics.ControlCentricity;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Distance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.team5406.robot.subsystems.vision.AprilTagCamera.Resolution;
 import frc.team5406.robot.subsystems.vision.VisionSubsystem;
@@ -51,6 +53,7 @@ public final class Constants {
 
   public static final AprilTag BLUE_SPEAKER_TAG = VisionSubsystem.getInstance().getTag(7).get();
   public static final AprilTag RED_SPEAKER_TAG = VisionSubsystem.getInstance().getTag(4).get();
+  public static final double FIELD_WIDTH = 16.4;
 
   public static class HID {
     public static final int DRIVER_CONTROLLER_PORT = 1;
@@ -61,23 +64,26 @@ public final class Constants {
   public static class Drive {
     public static final PIDConstants DRIVE_TURN_PID = new PIDConstants(8.0, 0.0, 0.3, 0.0,0.0);
     public static final double DRIVE_SLIP_RATIO = 0.08;
-    public static final double DRIVE_TURN_SCALAR = 30.0;
-    public static final double DRIVE_LOOKAHEAD = 3;
+    public static final double DRIVE_TURN_SCALAR = 50.0;
+    public static final double DRIVE_LOOKAHEAD = 6;
 
     public static final ControlCentricity DRIVE_CONTROL_CENTRICITY = ControlCentricity.FIELD_CENTRIC;
 
+
     private static final double DRIVE_THROTTLE_INPUT_CURVE_X[] = { 0.0, 0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900, 1.000 };
-    private static final double DRIVE_THROTTLE_INPUT_CURVE_Y[] = { 0.0, 0.042, 0.168, 0.378, 0.672, 1.050, 1.512, 2.508, 2.688, 3.402, 4.300 };
+    private static final double DRIVE_THROTTLE_INPUT_CURVE_Y[] = { 0.0, 0.052, 0.207, 0.465, 0.827, 1.293, 1.862, 2.534, 3.310, 4.189, 5.172 };
     private static final double DRIVE_TURN_INPUT_CURVE_X[] = { 0.0, 0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900, 1.0 };
-    private static final double DRIVE_TURN_INPUT_CURVE_Y[] = { 0.0, 0.008, 0.032, 0.072, 0.128, 0.200, 0.288, 0.392, 0.512, 0.768, 1.0 };
+    private static final double DRIVE_TURN_INPUT_CURVE_Y[] = { 0.0, 0.010, 0.050, 0.100, 0.150, 0.200, 0.250, 0.300, 0.400, 0.600, 1.0 };
 
     private static final SplineInterpolator SPLINE_INTERPOLATOR = new SplineInterpolator();
     public static final PolynomialSplineFunction DRIVE_THROTTLE_INPUT_CURVE = SPLINE_INTERPOLATOR.interpolate(DRIVE_THROTTLE_INPUT_CURVE_X, DRIVE_THROTTLE_INPUT_CURVE_Y);
     public static final PolynomialSplineFunction DRIVE_TURN_INPUT_CURVE = SPLINE_INTERPOLATOR.interpolate(DRIVE_TURN_INPUT_CURVE_X, DRIVE_TURN_INPUT_CURVE_Y);
 
     public static final SDSMK4SwerveModule.GearRatio DRIVE_GEAR_RATIO = SDSMK4SwerveModule.GearRatio.L2;
+    //public static final double DRIVE_WIDTH = Units.inchesToMeters(17.32);
     public static final double DRIVE_WIDTH = Units.Inches.of(17.32).in(Units.Meters);
-    public static final double DRIVE_LENGTH = Units.Inches.of(21.5).in(Units.Meters);
+    public static final double DRIVE_LENGTH = Units.Inches.of(17.32).in(Units.Meters);
+   // public static final double DRIVE_LENGTH = Units.inchesToMeters(21.5);
   }
 
   public static class DriveHardware {
@@ -128,7 +134,7 @@ public static class FeederHardware {
     public static final ToFSensor.ID TOF_SENSOR_ID = new ToFSensor.ID("FeederToFSensor", 1);
     public static final Measure<Current> FEEDER_CURRENT_LIMIT = Units.Amps.of(40);
     public static final double FEEDER_GEAR_RATIO = 11.0/34.0;
-    public static final double FEEDER_TARGET_RPM = 60;
+    public static final double FEEDER_TARGET_RPM = 4000;
     public static final boolean FEEDER_SENSOR_PHASE=true;
     public static final boolean FEEDER_INVERT_MOTOR=true;
     public static final double FEEDER_TOLERANCE=0.1;
@@ -150,7 +156,7 @@ public static class FeederHardware {
 }
 
   public static class ShooterHardware {
-    public static final double SHOOTER_TARGET_RPM = 3000;
+    public static final double SHOOTER_TARGET_RPM = 3600;
     public static final Measure<Current> SHOOTER_CURRENT_LIMIT = Units.Amps.of(60);
     public static final double ARM_GEAR_RATIO = 36.0/28.0; //FIXME
     public static final PIDConstants SHOOTER_PID = new PIDConstants( 0.000122, 0.0, 0.0, 0.0, 0.0);
@@ -160,17 +166,17 @@ public static class FeederHardware {
     public static final double SHOOTER_TOLERANCE=0.1;
     public static final boolean SHOOTER_SOFT_LIMITS=false;
     public static final double SHOOTER_MULTIPLIER = 6784;
-    public static final double SHOOTER_KS_LEFT = 0.15; 
-    public static final double SHOOTER_KV_LEFT = 0.11;
+    public static final double SHOOTER_KS_LEFT = 0.16; 
+    public static final double SHOOTER_KV_LEFT = 0.12;
     public static final double SHOOTER_KA_LEFT = 0.0750;
-    public static final double SHOOTER_KS_RIGHT = 0.15;
-    public static final double SHOOTER_KV_RIGHT = 0.11;
+    public static final double SHOOTER_KS_RIGHT = 0.16;
+    public static final double SHOOTER_KV_RIGHT = 0.12;
     public static final double SHOOTER_KA_RIGHT = 0.0821;
     public static final double SHOOTER_OUTTAKE_SPEED = -500;
 
-    public static final Spark.ID SHOOTER_MOTOR_ID_LEFT_ONE = new Spark.ID("ShooterHardware", 14);
-    public static final Spark.ID SHOOTER_MOTOR_ID_RIGHT_ONE = new Spark.ID("ShooterHardware", 16);
-    public static final double SHOOTER_SPEED_MULTIPLIER = 0.85;
+    public static final Spark.ID SHOOTER_MOTOR_ID_LEFT_ONE = new Spark.ID("ShooterHardware/Left", 14);
+    public static final Spark.ID SHOOTER_MOTOR_ID_RIGHT_ONE = new Spark.ID("ShooterHardware/Right", 16);
+    public static final double SHOOTER_SPEED_MULTIPLIER = 0.56;
     public static final int TOF_NOTE_SEEN_THRESHOLD = 0;
     public static final double SPEED_THRESHOLD = 50;
   }
@@ -240,7 +246,9 @@ public static class FeederHardware {
     public static final double CLIMBER_LOWER_LIMIT = -1;
     public static final double CLIMBER_UPPER_LIMIT = 1;
     public static final boolean CLIMBER_SOFT_LIMITS = false;
-    public static final double spoolDiameter = Units.Inches.of(1.75).in(Units.Meters);
+    //public static final double spoolDiameter = Units.inchesToMeters(1.75); //FIXME
+        public static final double spoolDiameter = Units.Inches.of(1.75).in(Units.Meters);
+
     
     public static final double CLIMBER_ZEROING_SPEED = -0.5; //FIXME
     public static final int CURRENT_SPIKE = 50; //FIXME
@@ -248,9 +256,9 @@ public static class FeederHardware {
     public static final double CLIMBER_HEIGHT_THRESHOLD = 1.5; //FIXME
     public static final double CLIMBER_MAX_HEIGHT = 160; //FIXME
     public static final double CLIMBER_VELOCITY_THRESHOLD = 100;
-    public static final double CLIMBER_POSITION_TWO = 80;
+    public static final double CLIMBER_POSITION_TWO = 53;
     public static final double CLIMBER_DOWN_HEIGHT = 2.5;
-    public static final double CLIMBER_CLIMB_HEIGHT = 4;
+    public static final double CLIMBER_CLIMB_HEIGHT = 2;
   }
 
   public static class VisionHardware {
@@ -261,30 +269,27 @@ public static class FeederHardware {
     );
     public static final Resolution CAMERA_B_RESOLUTION = Resolution.RES_1280_720;
     public static final Rotation2d CAMERA_B_FOV = Rotation2d.fromDegrees(79.7);
+    public static final double SPEAKER_OFFSET = 3.3;
   }
   
 //is not strong enough to make shot
-  public static class PodiumSettings {
-    public static final double PODIUM_ARM_ANGLE = 38; //rests at 37 degrees
-    public static final double PODIUM_SET_SPEED = 3000;
-    public static final double PODIUM_ARM_ANGLE_BACKWARDS = 70;
+  public static class FixedShotSettings {
+    public static final double PODIUM_ARM_ANGLE = 36;
+    public static final double SUBWOOFER_ARM_ANGLE = 53;
+    public static final double STAGE_ARM_ANGLE = 28;
   }
+
   public static class BuntSettings {
-    public static final double BUNT_ARM_ANGLE = 20; //rests at 37 degrees
-    public static final double BUNT_SET_SPEED = 1000;
+    public static final double BUNT_ARM_ANGLE = 16; //rests at 37 degrees
+    public static final double BUNT_SET_SPEED = 1500;
   }
+
 
   public static class ClearanceSettings {
     public static final double CLEARANCE_ARM_ANGLE = 60; //rests at 37 degrees
     public static final double CLEARANCE_SET_SPEED = 3000;
   }
 
-  public static class SubwooferSettings {
-    public static final double SUBWOOFER_ARM_ANGLE = 53;
-    public static final double SUBWOOFER_SET_SPEED = 3000;
-    public static final double SUBWOOFER_ARM_ANGLE_BACKWARDS = 110;
-    public static final double SHOOT_FEEDER_SPEED = 4000;
-  }
 
   public static class AmpShotSettings {
     public static final double AMPSHOT_ARM_ANGLE = 128; 
@@ -292,6 +297,8 @@ public static class FeederHardware {
     public static final double SHOOT_FEEDER_SPEED = 4000;
   }
 
+
+  
   public static class ObjectDetection {
     public static final double OBJECTDETECTION_NOTE_KP = 1e-2; 
     public static final double OBJECTDETECTION_NOTE_KI = 0;
@@ -299,10 +306,13 @@ public static class FeederHardware {
     public static final DoubleConsumer OBJECTDETECTION_NOTE_OFFSET = null;
   }
 
+
+
   public static class SmartDashboard {
     public static final String SMARTDASHBOARD_DEFAULT_TAB = "SmartDashboard";
     public static final String SMARTDASHBOARD_AUTO_MODE = "Auto Mode";
   }
 
-  public static Optional<Alliance> currentAlliance = null;
+public static Optional<Alliance> currentAlliance = null;
+
 }
